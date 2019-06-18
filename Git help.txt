@@ -1,0 +1,163 @@
+Git init  (to create a .git file)
+
+ls -hidden (to check the hidden files and folders)
+
+
+Git Basics -
+
+git status
+git add ( . for multiple files)
+git commit -m ""
+
+Git Checkout -
+git log 
+git checkout -- <filename> (for discarding changes in one particular file from the latest commit)( link - https://stackoverflow.com/questions/692246/undo-working-copy-modifications-of-one-file-in-git )
+git reset ( to unstage staged files, example-  "git add b.txt")
+{git revert --no-commit 0766c052..HEAD
+ git commit
+}
+
+git remote add origin git@github.com:buckyball99/SecuNet.git
+(TO CHECK IF GITHUB WAS SETUP - git remote -v
+)
+
+git branch (to check how many branches are present)
+
+WARNINGS -
+	Git adding the test project ( WARNING)
+	https://stackoverflow.com/questions/5834014/lf-will-be-replaced-by-crlf-in-git-what-is-that-and-is-it-important
+	Line-feed and carriage return 
+	(command - git config --global core.autocrlf true)
+
+
+
+ERRORS-  
+	1. (while- git push origin master)
+	        The authenticity of host 'github.com (192.30.253.113)' can't be established.
+		RSA key fingerprint is SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8.
+		Are you sure you want to continue connecting (yes/no)?
+	Soln-
+	 	https://help.github.com/articles/error-permission-denied-publickey/
+		http://zeeelog.blogspot.com/2017/08/the-authenticity-of-host-githubcom.html
+
+		Basically you need to decide whether to use https or ssh ( ssh needs a ssh key-value pair to allow access)
+		https://help.github.com/articles/which-remote-url-should-i-use/
+		https://help.github.com/articles/connecting-to-github-with-ssh/
+
+	2.	git bash terminal output on ( to check for existing ssh folders)
+		$ ls -al ~/.ssh
+
+		total 21 (26 later)
+		drwxr-xr-x 1 harsh 197609   0 Feb 17 14:35 ./
+		drwxr-xr-x 1 harsh 197609   0 Feb 17 14:27 ../
+		-rw-r--r-- 1 harsh 197609 407 Feb 17 14:35 known_hosts
+		-rw-r--r-- 1 harsh 197609 1766 Feb 17 18:55 id_rsa
+		-rw-r--r-- 1 harsh 197609  414 Feb 17 18:55 id_rsa.pub
+
+		Soln-
+		https://teamtreehouse.com/community/cannot-see-a-ssh-folder-when-typing-the-ls-la-command
+	
+	3. Creating an ssh key ( tutorial on github is wrong)
+	REFERCENCE - https://superuser.com/questions/335534/ssh-keygen-command-not-found-when-setting-up-git-on-windows
+	incorrect command -  ?????ssh-keygen -t rsa -b 4096 -C "harshvardhankanthode99@gmail.com"
+	correct command - $ ssh-keygen -t rsa -C "harshvardhankanthode99@gmail.com"
+		OUTPUT ON TERMINAL - Generating public/private rsa key pair.
+	
+
+
+
+
+	4. Setting up ssh_agent (Before adding a new SSH key to the ssh-agent to manage your keys, you should have checked for existing SSH keys and generated a new SSH key.)-
+		 $ eval $(ssh-agent -s)
+		 Agent pid 37732
+		
+		 ssh-add ~/.ssh/id_rsa
+
+
+	Path for identity -  /c/Users/harsh/.ssh/id_rsa
+
+
+
+
+
+
+
+6 .(git push -u origin master) error- 
+	REFERENCE - https://stackoverflow.com/questions/32056324/there-is-no-tracking-information-for-the-current-branch
+
+	 ! [rejected]        master -> master (fetch first)
+	error: failed to push some refs to 'git@github.com:buckyball99/SecuNet.git'
+	hint: Updates were rejected because the remote contains work that you
+	do
+	hint: not have locally. This is usually caused by another repository pushing
+	hint: to the same ref. You may want to first integrate the remote changes
+	hint: (e.g., 'git pull ...') before pushing again.
+	hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+
+	ON doing (git pull)-
+
+	PS C:\Users\harsh\Documents\CODING\WEB DEVEL\TestProject> git pull
+	Enter passphrase for key '/c/Users/harsh/.ssh/id_rsa':
+	Enter passphrase for key '/c/Users/harsh/.ssh/id_rsa':
+	warning: no common commits
+	remote: Enumerating objects: 3, done.
+	remote: Counting objects: 100% (3/3), done.
+	remote: Compressing objects: 100% (2/2), done.
+	remote: Total 3 (delta 0), reused 0 (delta 0), pack-reused 0
+	Unpacking objects: 100% (3/3), done.
+	From github.com:buckyball99/SecuNet
+	 * [new branch]      master     -> origin/master
+	There is no tracking information for the current branch.
+	Please specify which branch you want to merge with.
+	See git-pull(1) for details.
+
+ 	   git pull <remote> <branch>
+
+	If you wish to set tracking information for this branch you can do so
+	with:
+
+   	 git branch --set-upstream-to=origin/<branch> master
+
+
+
+
+
+
+	
+7.	Another error-
+	PS C:\Users\harsh\Documents\CODING\WEB DEVEL\TestProject> ( git pull origin master)
+	Enter passphrase for key '/c/Users/harsh/.ssh/id_rsa':
+	From github.com:buckyball99/SecuNet
+	 * branch            master     -> FETCH_HEAD
+	fatal: refusing to merge unrelated histories
+
+	NOTE- THIS IS BECAUSE OF THE LICENCE AND OTHER CHANGES I MADE ON THE WEB GITHUB, and since the local git was just made by "git init" and not cloned from the web 
+	github, both of them had unrelated histories.
+	NOTE -When you set up your local repo, did you clone your Github repo or just did git init? In the latter case those repos are unrelated (have no common commits)
+	 and you can't merge them (pull is fetch+merge). 
+	
+	SOLN-
+	REFERENCE-
+	https://stackoverflow.com/questions/38255655/trying-to-pull-files-from-my-github-repository-refusing-to-merge-unrelated-his	
+	PS C:\Users\harsh\Documents\CODING\WEB DEVEL\TestProject>( git pull origin master --allow-unrelated-histories)
+	Enter passphrase for key '/c/Users/harsh/.ssh/id_rsa':
+	From github.com:buckyball99/SecuNet
+	 * branch            master     -> FETCH_HEAD
+	Merge made by the 'recursive' strategy.
+	 LICENSE | 21 +++++++++++++++++++++
+	 1 file changed, 21 insertions(+)
+	 create mode 100644 LICENSE
+	
+
+	PS C:\Users\harsh\Documents\CODING\WEB DEVEL\TestProject> (git push -u origin master)
+	Enter passphrase for key '/c/Users/harsh/.ssh/id_rsa':
+	Counting objects: 539, done.
+	Delta compression using up to 4 threads.
+	Compressing objects: 100% (524/524), done.
+	Writing objects: 100% (539/539), 673.90 KiB | 1.83 MiB/s, done.
+	Total 539 (delta 93), reused 0 (delta 0)
+	remote: Resolving deltas: 100% (93/93), done.
+	To github.com:buckyball99/SecuNet.git
+	   c95b431..84621ef  master -> master
+	Branch 'master' set up to track remote branch 'master' from 'origin'.
+	PS C:\Users\harsh\Documents\CODING\WEB DEVEL\TestProject>
