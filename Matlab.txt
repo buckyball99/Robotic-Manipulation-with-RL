@@ -1,0 +1,10 @@
+A Fourier transform returns information about the frequency content of the signal. You can use the fft function to compute the discrete Fourier transform of a vector.
+>> fft(y)
+
+Use the numel function to return the number of elements in an array.
+
+
+
+The fft function in MATLAB uses only the sampled data to compute the Fourier transform. The f variable will represent the frequencies that correspond to the values in yfft.
+TASK
+Create a variable named f that contains a vector which starts at 0, ends at fs*(n-1)/n, and whose elements are spaced by fs/n.

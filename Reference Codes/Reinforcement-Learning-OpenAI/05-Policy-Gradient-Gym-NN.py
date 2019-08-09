@@ -38,6 +38,8 @@ y = 1. - tf.to_float(action)
 ########################################
 ### LOSS FUNCTION AND OPTIMIZATION ####
 ######################################
+for i in range(100):
+    print("Labels:",y,"Logits:", logits)
 cross_entropy = tf.nn.sigmoid_cross_entropy_with_logits(labels=y, logits=logits)
 optimizer = tf.train.AdamOptimizer(learning_rate)
 
@@ -56,14 +58,20 @@ gradients = []
 gradient_placeholders = []
 grads_and_vars_feed = []
 
+# 1. Obtain gradient,variables separately, 2. store gradient in gradients(array), 3. Create gradient_placeholder for adding mean_gradient later,
+# 4. Append Placeholders to gradient_placeholders(array), 5. Rejoin gradient_placeholder, variable to feed for 'apply_gradients'.
 for gradient, variable in gradients_and_variables:
     gradients.append(gradient)
     gradient_placeholder = tf.placeholder(tf.float32, shape=gradient.get_shape())
-    gradient_placeholders.append(gradient_placeholder)
+    gradient_placeholders.append(gradient_placeholder)    # A gradient placeholder for each gradient obtained through compute_gradients. This case has 4 (0,1,2,3) gradient_placeholder
     grads_and_vars_feed.append((gradient_placeholder, variable))
 
 
+# training_op is the last tf.operation to be run, which applies the new mean gradients to allow gradient_descent.
 training_op = optimizer.apply_gradients(grads_and_vars_feed)
+
+
+
 
 init = tf.global_variables_initializer()
 saver = tf.train.Saver()
@@ -132,6 +140,7 @@ with tf.Session() as sess:
 
                 # Get Actions and Gradients
                 action_val, gradients_val = sess.run([action, gradients], feed_dict={X: observations.reshape(1, num_inputs)})
+                # print(action_val,"",action_val[0][0])
 
                 # Perform Action
                 observations, reward, done, info = env.step(action_val[0][0])
@@ -151,14 +160,17 @@ with tf.Session() as sess:
         all_rewards = discount_and_normalize_rewards(all_rewards,discount_rate)
         feed_dict = {}
 
+        # Doubt about the 4 var_index in each step, but else cleared . all_gradients[game_index] contains all the gradients and rewards in a SINGLE GAME, happened until THAT ITERATION. ''[step] contains
+        # the gradient and reward of EACH STEP UNTIL DONE was TRUE.
 
-        for var_index, gradient_placeholder in enumerate(gradient_placeholders):
+        for var_index, gradient_placeholder in enumerate(gradient_placeholders):                         # The placeholders are so far empty.
+            print ("var_index in gradient_placeholders: {}, gradients ".format(var_index))
             mean_gradients = np.mean([reward * all_gradients[game_index][step][var_index]
                                       for game_index, rewards in enumerate(all_rewards)
                                           for step, reward in enumerate(rewards)], axis=0)
-            feed_dict[gradient_placeholder] = mean_gradients
+            feed_dict[gradient_placeholder] = mean_gradients                                            # Conviniently fill the placeholders with the new mean_gradients
 
-        sess.run(training_op, feed_dict=feed_dict)
+        sess.run(training_op, feed_dict=feed_dict)                                                      # Each Iteration, go to line 65 to rejoin grads,vars and run training_op
 
     print('SAVING GRAPH AND SESSION')
     meta_graph_def = tf.train.export_meta_graph(filename='/models/my-650-step-model.meta')

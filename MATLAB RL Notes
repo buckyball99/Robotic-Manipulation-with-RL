@@ -1,0 +1,11 @@
+1 the ACTOR network chooses an action.
+2 it's applied to the environment.
+3 the CRITIC network estimates what it thinks the value of that state-action pair is , 
+	3.5 - The values can be found from a Q-TABLE  of state-action pairs, or a neural network, when the number of states is too high
+4 it uses the reward from the env to determine how accurate its value prediction was
+5 The ERROR is the difference betweeen the (new estimated value of the previous state) , and the (old value of the previous state from the critic network).
+  The new estimated value is based on the recieved reward and the discounted value of the current state, and it can use this error as a sense of whether the things went better or worse, than the critic expected. 
+	5.5 - Bellman equation to find the New estimated value of the previous state.
+6  The critic uses this error to update itself, [Like the value function] so that it would have a better prediction the next  time it would be in this state.
+	6.5 The critic(Value functino) works for CONTINUOUS STATE SPACES, but NOT CONTINUOUS ACTION SPACES.
+7  The ACTOR ALSO updates itself, with the response from the critic, and the error term, so it would adjust the probabilities of taking that action in the future.
